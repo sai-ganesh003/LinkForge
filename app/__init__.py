@@ -24,7 +24,7 @@ def create_app():
     redis_client = redis.from_url(app.config['REDIS_URL'])
 
     app.config['SWAGGER'] = {
-        'title': 'URL Shortener API',
+        'title': 'LinkForge URL Shortener API',
         'uiversion': 3,
         'securityDefinitions': {
             'Bearer': {
@@ -38,7 +38,9 @@ def create_app():
     Swagger(app)
 
     from app.routes.url import url
+    from app.routes.auth import auth
     app.register_blueprint(url)
+    app.register_blueprint(auth)
 
     with app.app_context():
         from app import models

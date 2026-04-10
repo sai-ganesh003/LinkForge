@@ -4,10 +4,12 @@ from datetime import datetime, timedelta
 from app import db, redis_client
 from app.models import URL, User
 from app.utils.shortener import generate_short_code
+from app.utils.rate_limiter import rate_limit
 
 url = Blueprint('url', __name__)
 
 @url.route('/shorten', methods=['POST'])
+@rate_limit(max_requests=20, window_seconds=60)
 def shorten_url():
     """
     Shorten a URL
