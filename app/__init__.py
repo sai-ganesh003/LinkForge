@@ -21,7 +21,21 @@ def create_app():
     jwt.init_app(app)
 
     global redis_client
-    redis_client = redis.from_url(app.config['REDIS_URL'])
+    if app.config.get('TESTING'):
+        from unittest.mock import MagicMock
+        redis_client = MagicMock()
+        redis_client.get.return_value = None
+        redis_client.setex.return_value = True
+        redis_client.delete.return_value = True
+        redis_client.pipeline.return_value.__enter__ = MagicMock()
+        redis_client.pipeline.return_value.execute = MagicMock()
+        pipe = MagicMock()
+        pipe.incr = MagicMock()
+        pipe.expire = MagicMock()
+        pipe.execute = MagicMock()
+        redis_client.pipeline.return_value = pipe
+    else:
+        redis_client = redis.from_url(app.config['REDIS_URL'])
 
     app.config['SWAGGER'] = {
         'title': 'LinkForge URL Shortener API',
